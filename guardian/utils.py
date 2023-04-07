@@ -245,7 +245,7 @@ def evict_obj_perms_cache(obj):
 from django.contrib.auth.models import Group, Permission
 def get_group_model():
     try:
-        if getattr(settings,"GUARDIAN_GROUP_MODEL"):
+        if getattr(settings,"GUARDIAN_GROUP_MODEL",False):
             return django_apps.get_model(settings.GUARDIAN_GROUP_MODEL, require_ready=False)
         else:
             return Group
@@ -258,7 +258,7 @@ def get_group_model():
 
 def get_permission_model():
     try:
-        if getattr(settings, "GUARDIAN_PERMISSION_MODEL"):
+        if getattr(settings, "GUARDIAN_PERMISSION_MODEL",False):
             return django_apps.get_model(settings.GUARDIAN_PERMISSION_MODEL, require_ready=False)
         else:
             return Permission
