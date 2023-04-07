@@ -4,11 +4,11 @@ from django.db.models import Q
 from guardian.core import ObjectPermissionChecker
 from guardian.ctypes import get_content_type
 from guardian.exceptions import ObjectNotPersisted
-from django.contrib.auth.models import Permission
+from guardian.utils import get_permission_model
 
 import warnings
 
-
+Permission = get_permission_model()
 class BaseObjectPermissionManager(models.Manager):
 
     @property
