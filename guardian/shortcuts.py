@@ -515,7 +515,7 @@ def get_objects_for_user(user, perms, klass=None, use_groups=True, any_perm=Fals
             codename = perm
         codenames.add(codename)
         if app_label is not None:
-            new_ctype = ContentType.objects.get(app_label=app_label,
+            new_ctype = ContentType.objects.get(model=app_label,
                                                 permission__codename=codename)
             if ctype is not None and ctype != new_ctype:
                 raise MixedContentTypeError("ContentType was once computed "
