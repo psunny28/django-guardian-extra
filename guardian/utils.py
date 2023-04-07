@@ -11,7 +11,7 @@ from itertools import chain
 
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME, get_user_model
-from django.contrib.auth.models import AnonymousUser, Group
+from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.db.models import Model, QuerySet
 from django.http import HttpResponseForbidden, HttpResponseNotFound
@@ -22,6 +22,39 @@ from guardian.exceptions import NotUserNorGroup
 
 logger = logging.getLogger(__name__)
 abspath = lambda *p: os.path.abspath(os.path.join(*p))
+from django.contrib.auth.models import Group, Permission
+
+
+def get_group_model():
+    try:
+        if getattr(settings, "GUARDIAN_GROUP_MODEL", False):
+            return django_apps.get_model(settings.GUARDIAN_GROUP_MODEL, require_ready=False)
+        else:
+            return Group
+    except ValueError:
+        raise ImproperlyConfigured("GUARDIAN_GROUP_MODEL must be of the form 'app_label.model_name'")
+    except LookupError:
+        raise ImproperlyConfigured(
+            "GUARDIAN_GROUP_MODEL refers to model '%s' that has not been installed" % settings.GUARDIAN_GROUP_MODEL
+        )
+
+
+def get_permission_model():
+    try:
+        if getattr(settings, "GUARDIAN_PERMISSION_MODEL", False):
+            return django_apps.get_model(settings.GUARDIAN_PERMISSION_MODEL, require_ready=False)
+        else:
+            return Permission
+    except ValueError:
+        raise ImproperlyConfigured("GUARDIAN_PERMISSION_MODEL must be of the form 'app_label.model_name'")
+    except LookupError:
+        raise ImproperlyConfigured(
+            "GUARDIAN_PERMISSION_MODEL refers to model '%s' that has not been installed" % settings.GUARDIAN_PERMISSION_MODEL
+        )
+
+
+Group = get_group_model()
+Permission = get_permission_model()
 
 
 def get_anonymous_user():
@@ -141,6 +174,7 @@ def get_40x_or_None(request, perms, obj=None, login_url=None,
 from django.apps import apps as django_apps
 from django.core.exceptions import ImproperlyConfigured
 
+
 def get_obj_perm_model_by_conf(setting_name):
     """
     Return the model that matches the guardian settings.
@@ -197,7 +231,7 @@ def get_obj_perms_model(obj, base_cls, generic_cls):
         obj = obj.__class__
 
     fields = (f for f in obj._meta.get_fields()
-                if (f.one_to_many or f.one_to_one) and f.auto_created)
+              if (f.one_to_many or f.one_to_one) and f.auto_created)
 
     for attr in fields:
         model = getattr(attr, 'related_model', None)
@@ -213,7 +247,7 @@ def get_obj_perms_model(obj, base_cls, generic_cls):
     return generic_cls
 
 
-def get_user_obj_perms_model(obj = None):
+def get_user_obj_perms_model(obj=None):
     """
     Returns model class that connects given ``obj`` and User class.
     If obj is not specified, then user generic object permission model
@@ -224,7 +258,7 @@ def get_user_obj_perms_model(obj = None):
     return get_obj_perms_model(obj, UserObjectPermissionBase, UserObjectPermission)
 
 
-def get_group_obj_perms_model(obj = None):
+def get_group_obj_perms_model(obj=None):
     """
     Returns model class that connects given ``obj`` and Group class.
     If obj is not specified, then group generic object permission model
@@ -240,31 +274,3 @@ def evict_obj_perms_cache(obj):
         delattr(obj, '_guardian_perms_cache')
         return True
     return False
-
-
-from django.contrib.auth.models import Group, Permission
-def get_group_model():
-    try:
-        if getattr(settings,"GUARDIAN_GROUP_MODEL",False):
-            return django_apps.get_model(settings.GUARDIAN_GROUP_MODEL, require_ready=False)
-        else:
-            return Group
-    except ValueError:
-        raise ImproperlyConfigured("GUARDIAN_GROUP_MODEL must be of the form 'app_label.model_name'")
-    except LookupError:
-        raise ImproperlyConfigured(
-            "GUARDIAN_GROUP_MODEL refers to model '%s' that has not been installed" % settings.GUARDIAN_GROUP_MODEL
-        )
-
-def get_permission_model():
-    try:
-        if getattr(settings, "GUARDIAN_PERMISSION_MODEL",False):
-            return django_apps.get_model(settings.GUARDIAN_PERMISSION_MODEL, require_ready=False)
-        else:
-            return Permission
-    except ValueError:
-        raise ImproperlyConfigured("GUARDIAN_PERMISSION_MODEL must be of the form 'app_label.model_name'")
-    except LookupError:
-        raise ImproperlyConfigured(
-            "GUARDIAN_PERMISSION_MODEL refers to model '%s' that has not been installed" % settings.GUARDIAN_PERMISSION_MODEL
-        )
