@@ -240,3 +240,31 @@ def evict_obj_perms_cache(obj):
         delattr(obj, '_guardian_perms_cache')
         return True
     return False
+
+
+from django.contrib.auth.models import Group, Permission
+def get_group_model():
+    try:
+        if getattr(settings,"GUARDIAN_GROUP_MODEL"):
+            return django_apps.get_model(settings.GUARDIAN_GROUP_MODEL, require_ready=False)
+        else:
+            return Group
+    except ValueError:
+        raise ImproperlyConfigured("GUARDIAN_GROUP_MODEL must be of the form 'app_label.model_name'")
+    except LookupError:
+        raise ImproperlyConfigured(
+            "GUARDIAN_GROUP_MODEL refers to model '%s' that has not been installed" % settings.GUARDIAN_GROUP_MODEL
+        )
+
+def get_permission_model():
+    try:
+        if getattr(settings, "GUARDIAN_PERMISSION_MODEL"):
+            return django_apps.get_model(settings.GUARDIAN_PERMISSION_MODEL, require_ready=False)
+        else:
+            return Permission
+    except ValueError:
+        raise ImproperlyConfigured("GUARDIAN_PERMISSION_MODEL must be of the form 'app_label.model_name'")
+    except LookupError:
+        raise ImproperlyConfigured(
+            "GUARDIAN_PERMISSION_MODEL refers to model '%s' that has not been installed" % settings.GUARDIAN_PERMISSION_MODEL
+        )

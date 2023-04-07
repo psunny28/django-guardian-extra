@@ -7,10 +7,14 @@ from .models import (
     GroupObjectPermissionBase,
     GroupObjectPermissionAbstract,
     GroupObjectPermission,
-    Permission,
-    Group
+)
+from ..utils import (
+    get_group_model,
+    get_permission_model
 )
 
+Group = get_group_model()
+Permission = get_permission_model()
 
 __all__ = [
     'BaseObjectPermission',

@@ -1,4 +1,3 @@
-from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
@@ -7,7 +6,10 @@ from django.utils.translation import gettext_lazy as _
 from guardian.compat import user_model_label
 from guardian.ctypes import get_content_type
 from guardian.managers import GroupObjectPermissionManager, UserObjectPermissionManager
+from guardian.utils import get_permission_model,get_group_model
 
+Group = get_group_model()
+Permission = get_permission_model()
 
 class BaseObjectPermission(models.Model):
     """

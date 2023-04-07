@@ -34,9 +34,10 @@ def monkey_patch_user():
 
 
 def monkey_patch_group():
-    from django.contrib.auth.models import Group, Permission
+    from guardian.utils import get_group_model
     from .utils import get_group_obj_perms_model
     GroupObjectPermission = get_group_obj_perms_model()
+    Group = get_group_model()
     # Prototype Group methods
     setattr(Group, 'add_obj_perm',
             lambda self, perm, obj: GroupObjectPermission.objects.assign_perm(perm, self, obj))
