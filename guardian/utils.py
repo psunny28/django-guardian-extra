@@ -19,6 +19,7 @@ from django.shortcuts import render
 from guardian.conf import settings as guardian_settings
 from guardian.ctypes import get_content_type
 from guardian.exceptions import NotUserNorGroup
+from django.apps import apps as django_apps
 
 logger = logging.getLogger(__name__)
 abspath = lambda *p: os.path.abspath(os.path.join(*p))
@@ -171,7 +172,6 @@ def get_40x_or_None(request, perms, obj=None, login_url=None,
                                      redirect_field_name)
 
 
-from django.apps import apps as django_apps
 from django.core.exceptions import ImproperlyConfigured
 
 
