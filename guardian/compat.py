@@ -19,6 +19,8 @@ __all__ = [
 # to get_user_model deferred to execution time
 
 user_model_label = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
+group_model_label = getattr(settings, 'GUARDIAN_GROUP_MODEL', 'auth.Group')
+permission_model_label = getattr(settings, 'GUARDIAN_PERMISSION_MODEL', 'auth.Permission')
 
 
 def get_user_model_path():

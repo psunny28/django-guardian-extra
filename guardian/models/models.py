@@ -1,10 +1,10 @@
-from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from guardian.compat import user_model_label
+
+from guardian.compat import user_model_label, group_model_label, permission_model_label
 from guardian.ctypes import get_content_type
 from guardian.managers import GroupObjectPermissionManager, UserObjectPermissionManager
 
@@ -14,7 +14,7 @@ class BaseObjectPermission(models.Model):
     Abstract ObjectPermission class. Actual class should additionally define
     a ``content_object`` field and either ``user`` or ``group`` field.
     """
-    permission = models.ForeignKey(Permission, on_delete=models.CASCADE)
+    permission = models.ForeignKey(permission_model_label, on_delete=models.CASCADE)
 
     class Meta:
         abstract = True
@@ -60,14 +60,12 @@ class UserObjectPermissionBase(BaseObjectPermission):
 
 
 class UserObjectPermissionAbstract(UserObjectPermissionBase, BaseGenericObjectPermission):
-
     class Meta(UserObjectPermissionBase.Meta, BaseGenericObjectPermission.Meta):
         abstract = True
         unique_together = ['user', 'permission', 'object_pk']
 
 
 class UserObjectPermission(UserObjectPermissionAbstract):
-
     class Meta(UserObjectPermissionAbstract.Meta):
         abstract = False
 
@@ -76,7 +74,7 @@ class GroupObjectPermissionBase(BaseObjectPermission):
     """
     **Manager**: :manager:`GroupObjectPermissionManager`
     """
-    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    group = models.ForeignKey(group_model_label, on_delete=models.CASCADE)
 
     objects = GroupObjectPermissionManager()
 
@@ -86,12 +84,11 @@ class GroupObjectPermissionBase(BaseObjectPermission):
 
 
 class GroupObjectPermissionAbstract(GroupObjectPermissionBase, BaseGenericObjectPermission):
-
     class Meta(GroupObjectPermissionBase.Meta, BaseGenericObjectPermission.Meta):
         abstract = True
         unique_together = ['group', 'permission', 'object_pk']
 
-class GroupObjectPermission(GroupObjectPermissionAbstract):
 
+class GroupObjectPermission(GroupObjectPermissionAbstract):
     class Meta(GroupObjectPermissionAbstract.Meta):
         abstract = False
